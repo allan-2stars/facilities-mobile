@@ -1,0 +1,19 @@
+{
+  "name": "facilities-mobile",
+  "version": "1.0.0",
+  "description": "Facilities mobile project",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/allan-2stars/facilities-mobile.git"
+  },
+  "author": "Allan Wang",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/allan-2stars/facilities-mobile/issues"
+  },
+  "homepage": "https://github.com/allan-2stars/facilities-mobile#readme"
+}
