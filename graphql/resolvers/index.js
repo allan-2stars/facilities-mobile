@@ -1,7 +1,9 @@
 const authResolver = require('./auth');
+const profileResolver = require('./profile');
 
 const rootResolver = {
-  ...authResolver
+  ...authResolver,
+  ...profileResolver
 };
 
 module.exports = rootResolver;

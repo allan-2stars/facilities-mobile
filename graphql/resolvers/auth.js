@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const secretString = require('../../config/keys').secretOrPrivateKey;
 
 module.exports = {
+  // sign up
   createUser: args => {
     const { email, password } = args.userInput;
     // use return to wait for the correct result

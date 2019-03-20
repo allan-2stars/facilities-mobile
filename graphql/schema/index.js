@@ -6,6 +6,23 @@ module.exports = buildSchema(`
     _id:ID!
     email: String!
     password: String
+    active: Boolean!
+  }
+
+  type Profile{
+    user: User!
+    firstName: String!
+    lastName: String!
+    jobTitle: String
+    contact: String!
+    role: String!
+    emergencyContact: String
+    relationship: String
+    gender: String!
+    grade: String
+    class: String
+    charactor: String
+    moreInfo: String
   }
 
   type AuthData {
@@ -17,23 +34,33 @@ module.exports = buildSchema(`
   input UserInput {
     email: String!
     password: String!
+    active: Boolean!
+  }
+
+  input ProfileInput {
     firstName: String!
     lastName: String!
-    jobTitle: String!
+    jobTitle: String
     contact: String!
-    skype: String
-    analysisLevel: String!
-    active: Boolean!
+    role: String!
+    emergencyContact: String
+    relationship: String
+    gender: String!
+    grade: String
+    class: String
+    charactor: String
     moreInfo: String
   }
 
   type RootQuery{
-
+    users:[User!]
+    profile:[Profile!]
     login(email: String!, password: String!):AuthData!
   }
 
   type RootMutation {
     createUser(userInput: UserInput): User
+    createProfile(profileInput: ProfileInput): Profile
   }
   
   schema{

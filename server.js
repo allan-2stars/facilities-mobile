@@ -17,7 +17,7 @@ const app = express();
 
 /// --------------------------
 ///
-/// ---    Middle Wares    ---
+/// ---    Middlewares    ---
 ///
 // Helmet helps you secure your Express apps by setting various HTTP headers
 app.use(helmet());
