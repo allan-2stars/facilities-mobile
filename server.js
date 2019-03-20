@@ -6,6 +6,11 @@ const path = require('path');
 const helmet = require('helmet');
 const morgan = require('morgan');
 
+// import GraphQL
+const graphqlHttp = require('express-graphql');
+const graphQlSchema = require('./graphql/schema');
+const graphQlResolvers = require('./graphql/resolvers');
+
 const app = express();
 
 /// --------------------------
@@ -34,11 +39,16 @@ app.use(bodyParser.json());
 
 /// ------------------------------
 /// ------------------------------
+app.use(
+  '/graphql',
+  graphqlHttp({
+    schema: graphQlSchema,
+    rootValue: graphQlResolvers,
 
-app.get('/', function(req, res, next) {
-  res.send('Testing!');
-});
-
+    // set this true, you have the graphql tool in browser
+    graphiql: true
+  })
+);
 // DB config
 const db = require('./config/keys').mongoURI;
 const PORT = require('./config/keys').PORT || 8000;
