@@ -53,9 +53,9 @@ module.exports = buildSchema(`
   }
 
   type RootQuery{
-    users:[User!]
-    profile:[Profile!]
-    login(email: String!, password: String!):AuthData!
+    users: [User!]
+    profile: Profile!
+    login(email: String!, password: String!): AuthData!
   }
 
   type RootMutation {

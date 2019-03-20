@@ -18,6 +18,31 @@ module.exports = {
       });
   },
 
+  // peek Profile by manager
+  profilePeek: () => {
+    console.log('peeking profile by manager.');
+  },
+
+  // get profile by user ID
+  // GET
+  profile: (args, req) => {
+    return Profile.findOne({ user: req.userId })
+      .populate('user', ['-password'])
+      .then(profile => {
+        console.log(profile);
+        if (!profile) {
+          throw new Error('Profile Not found.');
+        }
+        return {
+          ...profile._doc,
+          _id: profile.id
+        };
+      })
+      .catch(err => {
+        throw err;
+      });
+  },
+
   // create Profile
   // POST
   createProfile: (args, req) => {
