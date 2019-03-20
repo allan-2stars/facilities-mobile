@@ -14,11 +14,17 @@ module.exports = buildSchema(`
     tokenExpiration: Int!
   }
 
-
-
   input UserInput {
     email: String!
     password: String!
+    firstName: String!
+    lastName: String!
+    jobTitle: String!
+    contact: String!
+    skype: String
+    analysisLevel: String!
+    active: Boolean!
+    moreInfo: String
   }
 
   type RootQuery{
