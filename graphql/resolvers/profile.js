@@ -18,18 +18,57 @@ module.exports = {
       });
   },
 
-  // peek Profile by manager
-  profilePeek: () => {
-    console.log('peeking profile by manager.');
+  // peek Profiles List only allowed for specific role
+  profilesPeek: (args, req) => {
+    // authentication first
+    if (!req.isAuth) {
+      throw new Error('Not Authenticated!');
+    }
+    // check if the request user is in manager role
+    return User.findById(req.userId)
+      .then(user => {
+        return Profile.findOne({ user: req.userId });
+      })
+      .then(profile => {
+        const allowedRoles = ['Teacher', 'Manager'];
+        let allowePeeking = false;
+        // check if there is a matched role, if find one
+        // set allowePeeking to true
+        allowedRoles.map(role => {
+          if (role === profile.role) allowePeeking = true;
+        });
+        // check if current request user has authorize to peek profile.
+        // if not throw error
+        if (!allowePeeking) {
+          throw new Error('Not Authorized for peeking profile.');
+        }
+
+        // if has authorize, get profile by user id
+        return Profile.find();
+      })
+      .then(profiles => {
+        return profiles.map(profile => {
+          return {
+            ...profile._doc,
+            _id: profile.id
+          };
+        });
+      })
+      .catch(err => {
+        throw err;
+      });
   },
 
   // get profile by user ID
   // GET
   profile: (args, req) => {
+    // authentication first
+    if (!req.isAuth) {
+      throw new Error('Not Authenticated!');
+    }
     return Profile.findOne({ user: req.userId })
       .populate('user', ['-password'])
       .then(profile => {
-        console.log(profile);
         if (!profile) {
           throw new Error('Profile Not found.');
         }

@@ -55,6 +55,7 @@ module.exports = buildSchema(`
   type RootQuery{
     users: [User!]
     profile: Profile!
+    profilesPeek: [Profile!]
     login(email: String!, password: String!): AuthData!
   }
 
