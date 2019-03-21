@@ -6,13 +6,17 @@ module.exports = buildSchema(`
     _id:ID!
     email: String!
     password: String
+    firstName: String!
+    lastName: String!
     active: Boolean!
   }
 
   type Profile{
-    user: User!
-    firstName: String!
-    lastName: String!
+    parents: [User]
+    courses:[Course]
+    staff:[User]
+    stdudents:[User]
+    user:User
     jobTitle: String
     contact: String!
     role: String!
@@ -25,6 +29,14 @@ module.exports = buildSchema(`
     moreInfo: String
   }
 
+  type Course{
+    staff: [User]
+    name: String!
+    difficulty: String!
+    description: String
+    moreInfo: String
+  }
+
   type AuthData {
     userId: ID!
     token: String!
@@ -34,12 +46,17 @@ module.exports = buildSchema(`
   input UserInput {
     email: String!
     password: String!
+    firstName: String!
+    lastName: String!
     active: Boolean!
   }
 
   input ProfileInput {
-    firstName: String!
-    lastName: String!
+    parents: [String]
+    courses:[String]
+    staff:[String]
+    stdudents:[String]
+
     jobTitle: String
     contact: String!
     role: String!
@@ -49,6 +66,14 @@ module.exports = buildSchema(`
     grade: String
     class: String
     charactor: String
+    moreInfo: String
+  }
+
+  input CourseInput{
+    staff: [String]
+    name: String!
+    difficulty: String!
+    description: String
     moreInfo: String
   }
 
@@ -62,6 +87,7 @@ module.exports = buildSchema(`
   type RootMutation {
     createUser(userInput: UserInput): User
     createProfile(profileInput: ProfileInput): Profile
+    createCourse(courseInput: CourseInput): Course
   }
   
   schema{

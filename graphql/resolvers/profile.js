@@ -2,19 +2,19 @@ const User = require('../../models/user');
 const Profile = require('../../models/profile');
 
 // redis
-const redis = require('redis');
+//const redis = require('redis');
 /// ------------------------------
 ///
 /// ----- Redis Client Setup -----
 ///
 ///-------------------------------
-const client = redis.createClient(6379, 'localhost');
-client.on('connect', () => {
-  console.log('Redis client connected');
-});
-client.on('error', function(err) {
-  console.log('Something went wrong ' + err);
-});
+// const client = redis.createClient(6379, 'localhost');
+// client.on('connect', () => {
+//   console.log('Redis client connected');
+// });
+// client.on('error', function(err) {
+//   console.log('Something went wrong ' + err);
+// });
 
 //// TEST Redis below, comment after test
 // client.set('my test key', 'my test value', redis.print);
@@ -25,11 +25,13 @@ client.on('error', function(err) {
 //   }
 //   console.log('GET result ->' + result);
 // });
-/// ---- End of Radis -----
+
+/// ----- End of Radis -----
+///-------------------------
 
 module.exports = {
   // must be same name as type RootQuery name
-  // GET
+  // Query
   users: () => {
     return User.find()
       .then(users => {
@@ -46,17 +48,19 @@ module.exports = {
   },
 
   // peek Profiles List only allowed for specific role
+  // Query
   profilesPeek: (args, req) => {
     // authentication first
     if (!req.isAuth) {
       throw new Error('Not Authenticated!');
     }
-    // check if the request user is in manager role
-    return User.findById(req.userId)
-      .then(user => {
-        return Profile.findOne({ user: req.userId });
-      })
+    // user logged in, so no need to check if user exists
+    return Profile.findOne({ user: req.userId })
+
       .then(profile => {
+        if (!profile) {
+          throw new Error('No profile exists, no authorized to peek!');
+        }
         const allowedRoles = ['Teacher', 'Manager'];
         let allowePeeking = false;
         // check if there is a matched role, if find one
@@ -69,37 +73,50 @@ module.exports = {
         if (!allowePeeking) {
           throw new Error('Not Authorized for peeking profile.');
         }
+        return Profile.find().populate('user', ['-password']);
 
-        // get cached data if exists
-        client.get('profileList', (error, result) => {
-          if (error) {
-            console.log(error);
-            throw error;
-          }
-          if (result) {
-            console.log('from cached data');
-            return JSON.parse(result).map(res => {
-              return {
-                // data parsed from Redis, no _doc property
-                ...res
-              };
-            });
-          }
-          // if no cache exists yet, access data from database
-          // and set cache
-          else {
-            console.log('else');
-            Profile.find().then(profiles => {
-              console.log('from database');
-              client.set('profileList', JSON.stringify(profiles));
-              return profiles.map(res => {
-                return {
-                  ...res._doc,
-                  _id: res.id
-                };
-              });
-            });
-          }
+        // // TODO: add redis later
+        //  // get cached data if exists
+        //     // no Redis for now, add in later
+        // client.get('profileList', (error, result) => {
+        //   if (error) {
+        //     console.log(error);
+        //     throw error;
+        //   }
+        //   if (result) {
+
+        //     //console.log('from cached data');
+        //     return JSON.parse(result).map(res => {
+        //       return {
+        //         // data parsed from Redis, no _doc property
+        //         ...res
+        //       };
+        //     });
+        //   }
+        //   // if no cache exists yet, access data from database
+        //   // and set cache
+        //   else {
+        //     console.log('else');
+        //     Profile.find().then(profiles => {
+        //       console.log('from database');
+        //       client.set('profileList', JSON.stringify(profiles));
+        //       return profiles.map(res => {
+        //         return {
+        //           ...res._doc,
+        //           _id: res.id
+        //         };
+        //       });
+        //     });
+        //   }
+        // });
+      })
+
+      .then(profiles => {
+        return profiles.map(res => {
+          return {
+            ...res._doc,
+            _id: res.id
+          };
         });
       })
       .catch(err => {
@@ -108,7 +125,7 @@ module.exports = {
   },
 
   // get profile by user ID
-  // GET
+  // Query
   profile: (args, req) => {
     // authentication first
     if (!req.isAuth) {
@@ -131,15 +148,17 @@ module.exports = {
   },
 
   // create Profile
-  // POST
+  // Mutation
   createProfile: (args, req) => {
     // authentication first
     if (!req.isAuth) {
       throw new Error('Not Authenticated!');
     }
     const {
-      firstName,
-      lastName,
+      courses,
+      staff,
+      students,
+      parents,
       jobTitle,
       contact,
       role,
@@ -155,9 +174,11 @@ module.exports = {
     //
     // profile info
     const profileData = {
+      courses,
+      staff,
+      students,
+      parents,
       user: req.userId,
-      firstName: firstName,
-      lastName: lastName,
       jobTitle: jobTitle ? jobTitle : '',
       contact: contact,
       role: role,

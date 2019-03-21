@@ -2,20 +2,36 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const profileSchema = new Schema({
+  parents: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: 'User'
+    }
+  ],
+  courses: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: 'Course'
+    }
+  ],
+  staff: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: 'User'
+    }
+  ],
+  students: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: 'User'
+    }
+  ],
   user: {
     type: Schema.Types.ObjectId,
     ref: 'User'
   },
-  firstName: {
-    type: String,
-    required: true
-  },
-  lastName: {
-    type: String,
-    required: false
-  },
   role: {
-    // can be supervisor, teacher, manager, student etc
+    // can be parent, staff, student
     type: String,
     required: true
   },
@@ -57,12 +73,6 @@ const profileSchema = new Schema({
     type: String,
     required: false
   },
-  //   friends: [
-  //     {
-  //       type: Schema.Types.ObjectId,
-  //       ref: 'User'
-  //     }
-  //   ],
   moreInfo: {
     type: String,
     required: false
