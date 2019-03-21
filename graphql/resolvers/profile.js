@@ -1,6 +1,32 @@
 const User = require('../../models/user');
 const Profile = require('../../models/profile');
 
+// redis
+const redis = require('redis');
+/// ------------------------------
+///
+/// ----- Redis Client Setup -----
+///
+///-------------------------------
+const client = redis.createClient(6379, 'localhost');
+client.on('connect', () => {
+  console.log('Redis client connected');
+});
+client.on('error', function(err) {
+  console.log('Something went wrong ' + err);
+});
+
+//// TEST Redis below, comment after test
+// client.set('my test key', 'my test value', redis.print);
+// client.get('my test key', function(error, result) {
+//   if (error) {
+//     console.log(error);
+//     throw error;
+//   }
+//   console.log('GET result ->' + result);
+// });
+/// ---- End of Radis -----
+
 module.exports = {
   // must be same name as type RootQuery name
   // GET
@@ -8,6 +34,7 @@ module.exports = {
     return User.find()
       .then(users => {
         return users.map(user => {
+          //console.log(user._doc);
           return {
             ...user._doc
           };
@@ -43,15 +70,36 @@ module.exports = {
           throw new Error('Not Authorized for peeking profile.');
         }
 
-        // if has authorize, get profile by user id
-        return Profile.find();
-      })
-      .then(profiles => {
-        return profiles.map(profile => {
-          return {
-            ...profile._doc,
-            _id: profile.id
-          };
+        // get cached data if exists
+        client.get('profileList', (error, result) => {
+          if (error) {
+            console.log(error);
+            throw error;
+          }
+          if (result) {
+            console.log('from cached data');
+            return JSON.parse(result).map(res => {
+              return {
+                // data parsed from Redis, no _doc property
+                ...res
+              };
+            });
+          }
+          // if no cache exists yet, access data from database
+          // and set cache
+          else {
+            console.log('else');
+            Profile.find().then(profiles => {
+              console.log('from database');
+              client.set('profileList', JSON.stringify(profiles));
+              return profiles.map(res => {
+                return {
+                  ...res._doc,
+                  _id: res.id
+                };
+              });
+            });
+          }
         });
       })
       .catch(err => {
