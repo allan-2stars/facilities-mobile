@@ -12,10 +12,9 @@ module.exports = buildSchema(`
   }
 
   type Profile{
-    parents: [User]
     courses:[Course]
-    staff:[User]
-    stdudents:[User]
+    tutor:[User]
+    students:[User]
     user:User
     jobTitle: String
     contact: String!
@@ -30,7 +29,6 @@ module.exports = buildSchema(`
   }
 
   type Course{
-    staff: [User]
     title: String!
     difficulty: String!
     description: String
@@ -39,9 +37,9 @@ module.exports = buildSchema(`
 
   type CourseAssigning{
     course: Course!
-    user:User!
-    assignedAt:String!
-    updatedAt:String!
+    tutor: User!
+    assignedAt: String!
+    updatedAt: String!
   }
 
   type AuthData {
@@ -59,10 +57,9 @@ module.exports = buildSchema(`
   }
 
   input ProfileInput {
-    parents: [String]
-    courses:[String]
-    staff:[String]
-    stdudents:[String]
+    courses: [String]
+    tutor: [String]
+    students: [String]
 
     jobTitle: String
     contact: String!
@@ -77,11 +74,14 @@ module.exports = buildSchema(`
   }
 
   input CourseInput{
-    staff: [String]
     title: String!
     difficulty: String!
     description: String
     moreInfo: String
+  }
+  input CourseAssigningInput{
+    courseId: ID!
+    tutorId: ID!
   }
 
   type RootQuery{
@@ -96,7 +96,7 @@ module.exports = buildSchema(`
     createUser(userInput: UserInput): User
     createProfile(profileInput: ProfileInput): Profile
     createCourse(courseInput: CourseInput): Course
-    assignCourse(courseId:ID!): CourseAssigning!
+    assignCourse(courseAssigningInput: CourseAssigningInput): CourseAssigning!
   }
   
   schema{

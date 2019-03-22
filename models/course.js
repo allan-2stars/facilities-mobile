@@ -2,12 +2,12 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const courseSchema = new Schema({
-  staff: [
-    {
-      type: Schema.Types.ObjectId,
-      ref: 'User'
-    }
-  ],
+  // tutor: [
+  //   {
+  //     type: Schema.Types.ObjectId,
+  //     ref: 'User'
+  //   }
+  // ],
   title: {
     type: String,
     required: true

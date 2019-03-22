@@ -2,19 +2,13 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const profileSchema = new Schema({
-  parents: [
-    {
-      type: Schema.Types.ObjectId,
-      ref: 'User'
-    }
-  ],
   courses: [
     {
       type: Schema.Types.ObjectId,
       ref: 'Course'
     }
   ],
-  staff: [
+  tutor: [
     {
       type: Schema.Types.ObjectId,
       ref: 'User'
@@ -31,7 +25,7 @@ const profileSchema = new Schema({
     ref: 'User'
   },
   role: {
-    // can be parent, staff, student
+    // student, manager, tutor
     type: String,
     required: true
   },

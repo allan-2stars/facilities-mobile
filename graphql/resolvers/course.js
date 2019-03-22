@@ -29,7 +29,7 @@ module.exports = {
         }
 
         const {
-          staff,
+          tutor,
           title,
           difficulty,
           description,
@@ -39,7 +39,7 @@ module.exports = {
         //
         // course info
         const courseData = {
-          staff,
+          tutor,
           title,
           difficulty: difficulty ? difficulty : '',
           description,

@@ -61,7 +61,7 @@ module.exports = {
         if (!profile) {
           throw new Error('No profile exists, no authorized to peek!');
         }
-        const allowedRoles = ['Teacher', 'Manager'];
+        const allowedRoles = ['Tutor', 'Manager'];
         let allowePeeking = false;
         // check if there is a matched role, if find one
         // set allowePeeking to true
@@ -158,7 +158,6 @@ module.exports = {
       courses,
       staff,
       students,
-      parents,
       jobTitle,
       contact,
       role,
@@ -177,7 +176,6 @@ module.exports = {
       courses,
       staff,
       students,
-      parents,
       user: req.userId,
       jobTitle: jobTitle ? jobTitle : '',
       contact: contact,

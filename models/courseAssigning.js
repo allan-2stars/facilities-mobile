@@ -7,7 +7,7 @@ const CourseAssigningSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: 'Course'
     },
-    user: {
+    tutor: {
       type: Schema.Types.ObjectId,
       ref: 'User'
     }
