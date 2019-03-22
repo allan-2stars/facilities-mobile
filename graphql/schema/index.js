@@ -31,10 +31,17 @@ module.exports = buildSchema(`
 
   type Course{
     staff: [User]
-    name: String!
+    title: String!
     difficulty: String!
     description: String
     moreInfo: String
+  }
+
+  type CourseAssigning{
+    course: Course!
+    user:User!
+    assignedAt:String!
+    updatedAt:String!
   }
 
   type AuthData {
@@ -71,7 +78,7 @@ module.exports = buildSchema(`
 
   input CourseInput{
     staff: [String]
-    name: String!
+    title: String!
     difficulty: String!
     description: String
     moreInfo: String
@@ -81,6 +88,7 @@ module.exports = buildSchema(`
     users: [User!]
     profile: Profile!
     profilesPeek: [Profile!]
+    courseAssigning:[CourseAssigning!]!
     login(email: String!, password: String!): AuthData!
   }
 
@@ -88,6 +96,7 @@ module.exports = buildSchema(`
     createUser(userInput: UserInput): User
     createProfile(profileInput: ProfileInput): Profile
     createCourse(courseInput: CourseInput): Course
+    assignCourse(courseId:ID!): CourseAssigning!
   }
   
   schema{
