@@ -1,8 +1,10 @@
-const User = require('../../models/user');
 const Profile = require('../../models/profile');
 const Course = require('../../models/course');
+const allowOperate = require('../../helpers/allowOperation');
 
 module.exports = {
+  // Show all courses
+  // Get course by
   // create course, just create, no amend
   // Mutation
   createCourse: (args, req) => {
@@ -15,16 +17,10 @@ module.exports = {
         if (!profile) {
           throw new Error('No profile exists, no authorized to create course!');
         }
-        const allowedRoles = ['Manager'];
-        let allowCreate = false;
-        // check if there is a matched role, if find one
-        // set allowCreate to true
-        allowedRoles.map(role => {
-          if (role === profile.role) allowCreate = true;
-        });
-        // check if current request user has authorize to peek profile.
+        // check if current request user has authorize to create course.
+        const allowedCreate = allowOperate(profile.role, 'Manager');
         // if not throw error
-        if (!allowCreate) {
+        if (!allowedCreate) {
           throw new Error('Not Authorized for creating course.');
         }
 

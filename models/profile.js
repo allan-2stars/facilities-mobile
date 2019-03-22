@@ -25,9 +25,10 @@ const profileSchema = new Schema({
     ref: 'User'
   },
   role: {
-    // student, manager, tutor
+    // Student, Manager, Tutor
     type: String,
-    required: true
+    required: true,
+    default: 'Restricted'
   },
   jobTitle: {
     // parent/supervisor/school members

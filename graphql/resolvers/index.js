@@ -1,13 +1,13 @@
 const authResolver = require('./auth');
 const profileResolver = require('./profile');
 const courseResolver = require('./course');
-const assigningResolver = require('./assigning');
+const assignedResolver = require('./assigned');
 
 const rootResolver = {
   ...authResolver,
   ...profileResolver,
   ...courseResolver,
-  ...assigningResolver
+  ...assignedResolver
 };
 
 module.exports = rootResolver;

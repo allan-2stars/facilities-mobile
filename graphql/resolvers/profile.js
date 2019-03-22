@@ -1,5 +1,6 @@
 const User = require('../../models/user');
 const Profile = require('../../models/profile');
+const allowOperate = require('../../helpers/allowOperation');
 
 // redis
 //const redis = require('redis');
@@ -61,16 +62,11 @@ module.exports = {
         if (!profile) {
           throw new Error('No profile exists, no authorized to peek!');
         }
-        const allowedRoles = ['Tutor', 'Manager'];
-        let allowePeeking = false;
-        // check if there is a matched role, if find one
-        // set allowePeeking to true
-        allowedRoles.map(role => {
-          if (role === profile.role) allowePeeking = true;
-        });
+
         // check if current request user has authorize to peek profile.
+        const allowedPeek = allowOperate(profile.role, ['Tutor', 'Manager']);
         // if not throw error
-        if (!allowePeeking) {
+        if (!allowedPeek) {
           throw new Error('Not Authorized for peeking profile.');
         }
         return Profile.find().populate('user', ['-password']);
@@ -154,13 +150,14 @@ module.exports = {
     if (!req.isAuth) {
       throw new Error('Not Authenticated!');
     }
+    // TODO: Only Manager can add/change role
     const {
       courses,
       staff,
       students,
       jobTitle,
       contact,
-      role,
+      role, // controlled by frontend, Student/Tutor/Manager
       emergencyContact,
       relationship,
       gender,
@@ -178,11 +175,11 @@ module.exports = {
       students,
       user: req.userId,
       jobTitle: jobTitle ? jobTitle : '',
-      contact: contact,
-      role: role,
+      contact,
+      role,
       emergencyContact: emergencyContact ? emergencyContactq : '',
       relationship: relationship ? relationship : '',
-      gender: gender,
+      gender,
       grade: grade ? grade : '',
       class: className ? className : '',
       charactor: charactor ? charactor : '',
