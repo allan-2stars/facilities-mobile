@@ -2,34 +2,6 @@ const User = require('../../models/user');
 const Profile = require('../../models/profile');
 const allowOperate = require('../../helpers/allowOperation');
 
-// redis
-//const redis = require('redis');
-/// ------------------------------
-///
-/// ----- Redis Client Setup -----
-///
-///-------------------------------
-// const client = redis.createClient(6379, 'localhost');
-// client.on('connect', () => {
-//   console.log('Redis client connected');
-// });
-// client.on('error', function(err) {
-//   console.log('Something went wrong ' + err);
-// });
-
-//// TEST Redis below, comment after test
-// client.set('my test key', 'my test value', redis.print);
-// client.get('my test key', function(error, result) {
-//   if (error) {
-//     console.log(error);
-//     throw error;
-//   }
-//   console.log('GET result ->' + result);
-// });
-
-/// ----- End of Radis -----
-///-------------------------
-
 module.exports = {
   // must be same name as type RootQuery name
   // Query
@@ -56,57 +28,21 @@ module.exports = {
       throw new Error('Not Authenticated!');
     }
     // user logged in, so no need to check if user exists
-    return Profile.findOne({ user: req.userId })
+    return User.findById(req.userId)
 
-      .then(profile => {
-        if (!profile) {
-          throw new Error('No profile exists, no authorized to peek!');
+      .then(user => {
+        if (!user) {
+          throw new Error('No User exists, no authorized to peek!');
         }
 
         // check if current request user has authorize to peek profile.
-        const allowedPeek = allowOperate(profile.role, ['Tutor', 'Manager']);
+        const allowedPeek = allowOperate(user.role, ['Tutor', 'Manager']);
         // if not throw error
         if (!allowedPeek) {
-          throw new Error('Not Authorized for peeking profile.');
+          throw new Error('Not Authorized for peeking profiles.');
         }
         return Profile.find().populate('user', ['-password']);
-
-        // // TODO: add redis later
-        //  // get cached data if exists
-        //     // no Redis for now, add in later
-        // client.get('profileList', (error, result) => {
-        //   if (error) {
-        //     console.log(error);
-        //     throw error;
-        //   }
-        //   if (result) {
-
-        //     //console.log('from cached data');
-        //     return JSON.parse(result).map(res => {
-        //       return {
-        //         // data parsed from Redis, no _doc property
-        //         ...res
-        //       };
-        //     });
-        //   }
-        //   // if no cache exists yet, access data from database
-        //   // and set cache
-        //   else {
-        //     console.log('else');
-        //     Profile.find().then(profiles => {
-        //       console.log('from database');
-        //       client.set('profileList', JSON.stringify(profiles));
-        //       return profiles.map(res => {
-        //         return {
-        //           ...res._doc,
-        //           _id: res.id
-        //         };
-        //       });
-        //     });
-        //   }
-        // });
       })
-
       .then(profiles => {
         return profiles.map(res => {
           return {
@@ -157,7 +93,8 @@ module.exports = {
       students,
       jobTitle,
       contact,
-      role, // controlled by frontend, Student/Tutor/Manager
+      firstName,
+      lastName,
       emergencyContact,
       relationship,
       gender,
@@ -176,7 +113,8 @@ module.exports = {
       user: req.userId,
       jobTitle: jobTitle ? jobTitle : '',
       contact,
-      role,
+      firstName,
+      lastName,
       emergencyContact: emergencyContact ? emergencyContactq : '',
       relationship: relationship ? relationship : '',
       gender,

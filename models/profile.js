@@ -24,11 +24,13 @@ const profileSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: 'User'
   },
-  role: {
-    // Student, Manager, Tutor
+  firstName: {
     type: String,
-    required: true,
-    default: 'Restricted'
+    required: true
+  },
+  lastName: {
+    type: String,
+    required: true
   },
   jobTitle: {
     // parent/supervisor/school members
@@ -44,19 +46,9 @@ const profileSchema = new Schema({
     type: String,
     required: false
   },
-  relationship: {
-    // for parents, relationship with students
-    type: String,
-    required: false // dynamic change as per role selected
-  },
   gender: {
     type: String,
     required: true
-  },
-  grade: {
-    // which year of this student
-    type: String,
-    required: false // dynamic change as per role selected
   },
   class: {
     // which class of this student

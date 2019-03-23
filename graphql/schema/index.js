@@ -6,8 +6,8 @@ module.exports = buildSchema(`
     _id:ID!
     email: String!
     password: String
-    firstName: String!
-    lastName: String!
+    role: String!
+
     active: Boolean!
   }
 
@@ -17,9 +17,10 @@ module.exports = buildSchema(`
     tutor:[User]
     students:[User]
     user:User!
+    firstName: String!
+    lastName: String!
     jobTitle: String
     contact: String!
-    role: String!
     emergencyContact: String
     relationship: String
     gender: String!
@@ -53,8 +54,7 @@ module.exports = buildSchema(`
   input UserInput {
     email: String!
     password: String!
-    firstName: String!
-    lastName: String!
+    role: String!
     active: Boolean!
   }
 
@@ -62,10 +62,10 @@ module.exports = buildSchema(`
     courses: [String]
     tutor: [String]
     students: [String]
-
+    firstName: String!
+    lastName: String!
     jobTitle: String
     contact: String!
-    role: String!
     emergencyContact: String
     relationship: String
     gender: String!

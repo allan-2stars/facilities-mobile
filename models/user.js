@@ -10,13 +10,10 @@ const userSchema = new Schema({
     type: String,
     required: true
   },
-  firstName: {
+  role: {
     type: String,
-    required: true
-  },
-  lastName: {
-    type: String,
-    required: true
+    required: true,
+    default: 'Restricted'
   },
   active: {
     type: Boolean,

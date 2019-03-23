@@ -1,6 +1,6 @@
 const CourseAssigned = require('../../models/courseAssigned');
 const Course = require('../../models/course');
-const Profile = require('../../models/profile');
+const User = require('../../models/user');
 const allowPeek = require('../../helpers/allowOperation');
 
 module.exports = {
@@ -30,9 +30,10 @@ module.exports = {
     if (!req.isAuth) {
       throw new Error('Not Authenticated!');
     }
-    const profile = await Profile.findOne({ user: req.userId });
+
+    const user = await User.findById(req.userId);
     // helper function
-    const allowed = allowPeek(profile.role, 'Manager');
+    const allowed = allowPeek(user.role, 'Manager');
     // check if current user has authorize to peek courses assigned status.
     // if not throw error
     if (!allowed) {
