@@ -3,23 +3,6 @@ const Profile = require('../../models/profile');
 const allowOperate = require('../../helpers/allowOperation');
 
 module.exports = {
-  // must be same name as type RootQuery name
-  // Query
-  users: () => {
-    return User.find()
-      .then(users => {
-        return users.map(user => {
-          //console.log(user._doc);
-          return {
-            ...user._doc
-          };
-        });
-      })
-      .catch(err => {
-        throw err;
-      });
-  },
-
   // peek Profiles List only allowed for specific role
   // Query
   profilesPeek: (args, req) => {
@@ -86,7 +69,6 @@ module.exports = {
     if (!req.isAuth) {
       throw new Error('Not Authenticated!');
     }
-    // TODO: Only Manager can add/change role
     const {
       courses,
       staff,
@@ -98,7 +80,6 @@ module.exports = {
       emergencyContact,
       relationship,
       gender,
-      grade,
       className,
       charactor,
       moreInfo
@@ -118,7 +99,6 @@ module.exports = {
       emergencyContact: emergencyContact ? emergencyContactq : '',
       relationship: relationship ? relationship : '',
       gender,
-      grade: grade ? grade : '',
       class: className ? className : '',
       charactor: charactor ? charactor : '',
       moreInfo: moreInfo ? moreInfo : ''
@@ -140,7 +120,6 @@ module.exports = {
             }
           )
             .then(profile => {
-              //console.log('profile updated now');
               return {
                 ...profile._doc,
                 _id: profile.id
@@ -155,7 +134,6 @@ module.exports = {
           return new Profile(profileData)
             .save()
             .then(profile => {
-              //console.log('new profile saved now');
               return {
                 ...profile._doc,
                 _id: profile.id
