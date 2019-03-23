@@ -12,10 +12,11 @@ module.exports = buildSchema(`
   }
 
   type Profile{
+    _id: ID!
     courses:[Course]
     tutor:[User]
     students:[User]
-    user:User
+    user:User!
     jobTitle: String
     contact: String!
     role: String!
@@ -29,6 +30,7 @@ module.exports = buildSchema(`
   }
 
   type Course{
+    _id: ID!
     title: String!
     difficulty: String!
     description: String
