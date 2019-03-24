@@ -10,7 +10,7 @@ const morgan = require('morgan');
 const isAuth = require('./middleware/is-auth');
 // import GraphQL
 const graphqlHttp = require('express-graphql');
-const graphQlSchema = require('./graphql/schema');
+const graphQlSchema = require('./graphql/schema.graphql');
 const graphQlResolvers = require('./graphql/resolvers');
 
 const app = express();
