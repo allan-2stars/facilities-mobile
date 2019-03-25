@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
-import ApolloClient, { gql } from 'apollo-boost';
+import ApolloClient from 'apollo-boost';
 import AuthContext from '../context/auth-context';
+
+import * as graphql from '../graphql';
 
 class AuthPage extends Component {
   state = {
@@ -53,45 +55,12 @@ class AuthPage extends Component {
         return;
       }
     }
-    // Login query
-    const LOG_IN = gql`
-      query($email: String!, $password: String!) {
-        login(email: $email, password: $password) {
-          userId
-          token
-          tokenExpiration
-        }
-      }
-    `;
-
-    // create new user mutation
-    const CREATE_USER = gql`
-      mutation CreateUser(
-        $email: String!
-        $password: String!
-        $role: String!
-        $active: Boolean!
-      ) {
-        createUser(
-          userInput: {
-            email: $email
-            password: $password
-            role: $role
-            active: $active
-          }
-        ) {
-          email
-          role
-          _id
-        }
-      }
-    `;
 
     // Login user
     if (this.state.isLogin) {
       client
         .query({
-          query: LOG_IN,
+          query: graphql.LOG_IN,
           variables: {
             email,
             password
@@ -121,7 +90,7 @@ class AuthPage extends Component {
     if (!this.state.isLogin) {
       client
         .mutate({
-          mutation: CREATE_USER,
+          mutation: graphql.CREATE_USER,
           variables: {
             email,
             password,
