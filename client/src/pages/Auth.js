@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
-
-import './Auth.css';
+import ApolloClient, { gql } from 'apollo-boost';
 import AuthContext from '../context/auth-context';
 
 class AuthPage extends Component {
@@ -17,6 +16,7 @@ class AuthPage extends Component {
     super(props);
     this.emailEl = React.createRef();
     this.passwordEl = React.createRef();
+    this.passwordConfirmEl = React.createRef();
   }
 
   switchModeHandler = () => {
@@ -28,90 +28,182 @@ class AuthPage extends Component {
   submitHandler = event => {
     // prevent default behaviour
     event.preventDefault();
-    // get email and password
+
+    // create a new apollo client for graphql
+    const client = new ApolloClient({
+      uri: 'http://localhost:8000/graphql'
+    });
+    // get values for input
     const email = this.emailEl.current.value;
     const password = this.passwordEl.current.value;
-    //const role = this.roleEl.current.value
-    // send to backend
+
+    const role = 'Restricted'; // default value
+    const active = true; // default value
+
+    // input validation
+    // TODO: Validation show up on page in red
     if (email.trim().length === 0 || password.trim().length === 0) {
+      console.log('email or password cannot be empty.');
       return;
     }
-
-    let requestBody = {
-      query: `
-        query{
-          login(email:"${email}", password:"${password}"){
-            userId
-            token
-            tokenExpiration
-          }
-        }
-      `
-    };
-
     if (!this.state.isLogin) {
-      requestBody = {
-        query: `mutation {
-          createUser(userInput:{email:"${email}", password:"${password}", role:"Manager", active:${true}}){
-            email
-            _id
+      const passwordConfirm = this.passwordConfirmEl.current.value;
+      if (passwordConfirm.trim() !== password.trim()) {
+        console.log('confirmed password not match.');
+        return;
+      }
+    }
+    // Login query
+    const LOG_IN = gql`
+      query($email: String!, $password: String!) {
+        login(email: $email, password: $password) {
+          userId
+          token
+          tokenExpiration
+        }
+      }
+    `;
+
+    // create new user mutation
+    const CREATE_USER = gql`
+      mutation CreateUser(
+        $email: String!
+        $password: String!
+        $role: String!
+        $active: Boolean!
+      ) {
+        createUser(
+          userInput: {
+            email: $email
+            password: $password
+            role: $role
+            active: $active
           }
-        }`
-      };
+        ) {
+          email
+          role
+          _id
+        }
+      }
+    `;
+
+    // Login user
+    if (this.state.isLogin) {
+      client
+        .query({
+          query: LOG_IN,
+          variables: {
+            email,
+            password
+          }
+        })
+        .then(res => {
+          if (res.loading) {
+            return <h1>Loading...</h1>;
+          }
+          return res;
+        })
+        .then(resData => {
+          if (resData.data.login) {
+            this.context.login(
+              resData.data.login.token,
+              resData.data.login.userId,
+              resData.data.login.tokenExpiration
+            );
+          }
+        })
+        .catch(err => {
+          console.log('Errors Happening:', err);
+        });
     }
 
-    fetch('http://localhost:8000/graphql', {
-      method: 'POST',
-      body: JSON.stringify(requestBody),
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    })
-      .then(res => {
-        if (res.status !== 200 && res.status !== 201) {
-          throw new Error('Failed!');
-        }
-        return res.json();
-      })
-      .then(resData => {
-        if (resData.errors) {
-          throw new Error(resData.errors[0].message);
-        }
-        if (resData.data.login) {
-          this.context.login(
-            resData.data.login.token,
-            resData.data.login.userId,
-            resData.data.login.tokenExpiration
-          );
-        } else {
-          // redirect to Login
-          console.log('Sign up successful.');
+    // Create new user
+    if (!this.state.isLogin) {
+      client
+        .mutate({
+          mutation: CREATE_USER,
+          variables: {
+            email,
+            password,
+            role,
+            active
+          }
+        })
+        .then(res => {
           this.setState({ isLogin: true });
-        }
-      })
-      .catch(err => {
-        console.log('Errors Happening:', err);
-      });
+          // redirect to login page
+          console.log('create user successful.', res.data);
+        })
+        .catch(err => {
+          console.log('Errors Happening:', err);
+        });
+    }
     ///
   };
+  ///
   render() {
+    // Confirm password for Sign up page
+    let confirmPassword = '';
+    if (!this.state.isLogin) {
+      confirmPassword = (
+        <div className='form-group'>
+          <label htmlFor='password2'>Confirm Password</label>
+          <input
+            className='form-control'
+            type='password'
+            id='password2'
+            ref={this.passwordConfirmEl}
+          />
+        </div>
+      );
+    }
     return (
-      <form className='auth-form' onSubmit={this.submitHandler}>
-        <div className='form-control'>
-          <label htmlFor='email'>Email</label>
-          <input type='email' id='email' ref={this.emailEl} />
+      <div className='auth'>
+        <div className='container'>
+          <div className='row'>
+            <div className='col-md-8 m-auto'>
+              <form onSubmit={this.submitHandler}>
+                <div className='text-right'>
+                  <button
+                    className='btn btn-primary text-right mt-3'
+                    type='button'
+                    onClick={this.switchModeHandler}
+                  >
+                    Switch to {this.state.isLogin ? 'Sign Up' : 'Login'}
+                  </button>
+                </div>
+
+                <div className='form-group'>
+                  <label htmlFor='email'>Email</label>
+                  <input
+                    className='form-control'
+                    type='email'
+                    id='email'
+                    ref={this.emailEl}
+                  />
+                  <small id='emailHelp' className='form-text text-muted'>
+                    We'll never share your email with anyone else.
+                  </small>
+                </div>
+                <div className='form-group'>
+                  <label htmlFor='password'>Password</label>
+                  <input
+                    className='form-control'
+                    type='password'
+                    id='password'
+                    ref={this.passwordEl}
+                  />
+                </div>
+                {confirmPassword}
+
+                <button className='btn btn-info btn-block mt-4' type='submit'>
+                  Submit
+                </button>
+              </form>
+            </div>
+          </div>
         </div>
-        <div className='form-control'>
-          <label htmlFor='password'>Password</label>
-          <input type='password' id='password' ref={this.passwordEl} />
-        </div>
-        <div className='form-actions'>
-          <button type='button' onClick={this.switchModeHandler}>
-            Switch to {this.state.isLogin ? 'Sign Up' : 'Login'}
-          </button>
-          <button type='submit'>Submit</button>
-        </div>
-      </form>
+      </div>
     );
   }
 }
