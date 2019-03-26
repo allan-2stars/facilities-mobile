@@ -1,4 +1,4 @@
-const Profile = require('../../models/profile');
+const User = require('../../models/user');
 const Course = require('../../models/course');
 const allowOperate = require('../../helpers/allowOperation');
 
@@ -12,13 +12,13 @@ module.exports = {
     if (!req.isAuth) {
       throw new Error('Not Authenticated!');
     }
-    return Profile.findOne({ user: req.userId })
-      .then(profile => {
-        if (!profile) {
-          throw new Error('No profile exists, no authorized to create course!');
+    return User.findOne({ user: req.userId })
+      .then(user => {
+        if (!user) {
+          throw new Error('No user exists, no authorized to create course!');
         }
         // check if current request user has authorize to create course.
-        const allowedCreate = allowOperate(profile.role, 'Manager');
+        const allowedCreate = allowOperate(user.role, 'Manager');
         // if not throw error
         if (!allowedCreate) {
           throw new Error('Not Authorized for creating course.');
